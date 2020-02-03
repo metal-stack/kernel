@@ -82,4 +82,4 @@ RUN set -ex \
 # Kernel
 RUN set -ex \
  && make -j "$(getconf _NPROCESSORS_ONLN)" KCFLAGS="-fno-pie" \
- && mv linux/arch/x86/boot/bzImage metal-kernel
+ && mv arch/x86/boot/bzImage /metal-kernel
