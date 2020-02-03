@@ -1,0 +1,108 @@
+From 3fc46fc9f68c71e21afde62984444b2ffdd1ea90 Mon Sep 17 00:00:00 2001
+From: Martin Kepplinger <martin.kepplinger@ginzinger.com>
+Date: Thu, 31 Jan 2019 11:14:18 +0100
+Subject: [PATCH] ipconfig: add carrier_timeout kernel parameter
+
+commit 3fb72f1e6e61 ("ipconfig wait for carrier") added a
+"wait for carrier" policy, with a fixed worst case maximum wait
+of two minutes.
+
+Now make the wait for carrier timeout configurable on the kernel
+commandline and use the 120s as the default.
+
+The timeout messages introduced with
+commit 5e404cd65860 ("ipconfig: add informative timeout messages while
+waiting for carrier") are done in a fixed interval of 20 seconds, just
+like they were before (240/12).
+
+Signed-off-by: Martin Kepplinger <martin.kepplinger@ginzinger.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+---
+ .../admin-guide/kernel-parameters.txt         |  5 ++++
+ net/ipv4/ipconfig.c                           | 27 +++++++++++++++----
+ 2 files changed, 27 insertions(+), 5 deletions(-)
+
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index b799bcf67d7b..7afb2fedde0a 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -461,6 +461,11 @@
+ 			possible to determine what the correct size should be.
+ 			This option provides an override for these situations.
+ 
++	carrier_timeout=
++			[NET] Specifies amount of time (in seconds) that
++			the kernel should wait for a network carrier. By default
++			it waits 120 seconds.
++
+ 	ca_keys=	[KEYS] This parameter identifies a specific key(s) on
+ 			the system trusted keyring to be used for certificate
+ 			trust validation.
+diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
+index b9a9873c25c6..9bcca08efec9 100644
+--- a/net/ipv4/ipconfig.c
++++ b/net/ipv4/ipconfig.c
+@@ -85,7 +85,6 @@
+ 
+ /* Define the friendly delay before and after opening net devices */
+ #define CONF_POST_OPEN		10	/* After opening: 10 msecs */
+-#define CONF_CARRIER_TIMEOUT	120000	/* Wait for carrier timeout */
+ 
+ /* Define the timeout for waiting for a DHCP/BOOTP/RARP reply */
+ #define CONF_OPEN_RETRIES 	2	/* (Re)open devices twice */
+@@ -101,6 +100,9 @@
+ #define NONE cpu_to_be32(INADDR_NONE)
+ #define ANY cpu_to_be32(INADDR_ANY)
+ 
++/* Wait for carrier timeout default in seconds */
++static unsigned int carrier_timeout = 120;
++
+ /*
+  * Public IP configuration
+  */
+@@ -268,9 +270,9 @@ static int __init ic_open_devs(void)
+ 
+ 	/* wait for a carrier on at least one device */
+ 	start = jiffies;
+-	next_msg = start + msecs_to_jiffies(CONF_CARRIER_TIMEOUT/12);
++	next_msg = start + msecs_to_jiffies(20000);
+ 	while (time_before(jiffies, start +
+-			   msecs_to_jiffies(CONF_CARRIER_TIMEOUT))) {
++			   msecs_to_jiffies(carrier_timeout * 1000))) {
+ 		int wait, elapsed;
+ 
+ 		for_each_netdev(&init_net, dev)
+@@ -283,9 +285,9 @@ static int __init ic_open_devs(void)
+ 			continue;
+ 
+ 		elapsed = jiffies_to_msecs(jiffies - start);
+-		wait = (CONF_CARRIER_TIMEOUT - elapsed + 500)/1000;
++		wait = (carrier_timeout * 1000 - elapsed + 500) / 1000;
+ 		pr_info("Waiting up to %d more seconds for network.\n", wait);
+-		next_msg = jiffies + msecs_to_jiffies(CONF_CARRIER_TIMEOUT/12);
++		next_msg = jiffies + msecs_to_jiffies(20000);
+ 	}
+ have_carrier:
+ 	rtnl_unlock();
+@@ -1780,3 +1782,18 @@ static int __init vendor_class_identifier_setup(char *addrs)
+ 	return 1;
+ }
+ __setup("dhcpclass=", vendor_class_identifier_setup);
++
++static int __init set_carrier_timeout(char *str)
++{
++	ssize_t ret;
++
++	if (!str)
++		return 0;
++
++	ret = kstrtouint(str, 0, &carrier_timeout);
++	if (ret)
++		return 0;
++
++	return 1;
++}
++__setup("carrier_timeout=", set_carrier_timeout);
+-- 
+2.20.1
+
