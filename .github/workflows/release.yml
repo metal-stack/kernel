@@ -11,24 +11,30 @@ jobs:
  
     runs-on: ubuntu-latest
  
+    strategy:
+      matrix:
+        kernel: ["5.4.18"]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@master
-      - name: Set up Go 1.13
-        uses: actions/setup-go@v1.1.2
-        with:
-          go-version: '1.13.x'
       - name: Build project # This would actually build your project, using zip for an example artifact
         run: |
-          make release
+          docker build --build-arg KERNEL_MAJOR="v5.x" \
+                       --build-arg KERNEL_VERSION=${{ matrix.kernel }} \
+                       --build-arg KERNEL_SERIES="mainline" \
+                       --tag metal-stack/kernel .
+          docker export $(docker create metal-stack/kernel /dev/null) > kernel.tar
+          tar -xf kernel.tar metal-kernel
+          mv metal-kernel metal-kernel-${{ matrix.kernel }}
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ matrix.kernel }}
+          release_name: Release ${{ matrix.kernel }}
           draft: false
           prerelease: false
       - name: Upload Release Asset
@@ -37,7 +43,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./go-lldpd.tgz
-          asset_name: go-lldpd.tgz
-          asset_content_type: application/tar+gzip
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./metal-kernel-${{ matrix.kernel }}
+          asset_name: metal-kernel
+          asset_content_type: application/bzip
