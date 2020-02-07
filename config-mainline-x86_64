@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86 5.4.12 Kernel Configuration
+# Linux/x86 5.4.17 Kernel Configuration
 #
 
 #
@@ -1714,7 +1714,9 @@ CONFIG_VXLAN=y
 # CONFIG_GENEVE is not set
 # CONFIG_GTP is not set
 # CONFIG_MACSEC is not set
-# CONFIG_NETCONSOLE is not set
+CONFIG_NETCONSOLE=y
+CONFIG_NETPOLL=y
+CONFIG_NET_POLL_CONTROLLER=y
 # CONFIG_TUN is not set
 # CONFIG_TUN_VNET_CROSS_LE is not set
 CONFIG_VETH=y
