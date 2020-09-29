@@ -79,6 +79,11 @@ RUN set -ex \
       patch -p1 < /0001-ipconfig-add-carrier_timeout-kernel-parameter.patch; \
     esac
 
+# Kata patches
+RUN patch -p1 < /kata-patches/5.4.x/0001-9p-retrieve-fid-from-file-when-file-instance-exist.patch \
+ && patch -p1 < /kata-patches/5.4.x/0001-NO-UPSTREAM-9P-always-use-cached-inode-to-fill-in-v9.patch \
+ && patch -p1 < /kata-patches/5.4.x/0002-net-virtio_vsock-Fix-race-condition-between-bind-and.patch
+
 # Kernel
 RUN set -ex \
  && make -j "$(getconf _NPROCESSORS_ONLN)" KCFLAGS="-fno-pie" \
