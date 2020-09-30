@@ -5,8 +5,9 @@ KERNEL_MAJOR := $(or $(KERNEL_MAJOR),v5.x)
 .PHONY: build
 build:
 	rm -f kernel.tar metal-kernel
+	docker rm metal-stack-kernel || true
 	docker build --build-arg KERNEL_MAJOR=$(KERNEL_MAJOR) \
 							 --build-arg KERNEL_VERSION=$(KERNEL_VERSION) \
 							 --build-arg KERNEL_SERIES=$(KERNEL_SERIES) \
 							 --tag metal-stack/kernel .
-	docker export $(shell docker create metal-stack/kernel /dev/null) > kernel.tar
+	docker export $(shell docker create --name metal-stack-kernel metal-stack/kernel /dev/null) > kernel.tar
