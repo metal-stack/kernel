@@ -15,6 +15,7 @@ RUN set -ex \
     build-base \
     curl \
     diffutils \
+    findutils \
     flex \
     git \
     gmp-dev \
@@ -36,7 +37,8 @@ RUN set -ex \
     tar \
     xz \
     xz-dev \
-    zlib-dev
+    zlib-dev \
+    zstd
 
 ENV KERNEL_SOURCE=https://www.kernel.org/pub/linux/kernel/${KERNEL_MAJOR}/linux-${KERNEL_VERSION}.tar.xz
 ENV KERNEL_SHA256_SUMS=https://www.kernel.org/pub/linux/kernel/${KERNEL_MAJOR}/sha256sums.asc
@@ -70,6 +72,8 @@ WORKDIR /linux
 RUN set -ex \
  && KERNEL_DEF_CONF=/linux/arch/x86/configs/x86_64_defconfig \
  && cp /config-${KERNEL_SERIES}-$(uname -m) ${KERNEL_DEF_CONF} \
+ && make clean \
+ && make scripts \
  && make defconfig \
  && make oldconfig
 
