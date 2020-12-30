@@ -64,7 +64,7 @@ RUN set -ex \
  && xz -d linux-${KERNEL_VERSION}.tar.xz \
  && curl -fsSLO ${KERNEL_PGP2_SIGN} \
  && gpg2 --verify linux-${KERNEL_VERSION}.tar.sign linux-${KERNEL_VERSION}.tar \
- && cat linux-${KERNEL_VERSION}.tar | tar --absolute-names -x && mv /linux-${KERNEL_VERSION} /linux
+ && tar --absolute-names -xf linux-${KERNEL_VERSION}.tar && mv /linux-${KERNEL_VERSION} /linux
 
 WORKDIR /linux
 
@@ -73,6 +73,7 @@ RUN set -ex \
  && KERNEL_DEF_CONF=/linux/arch/x86/configs/x86_64_defconfig \
  && cp /config-${KERNEL_SERIES}-$(uname -m) ${KERNEL_DEF_CONF} \
  && make clean \
+ && make oldconfig \
  && make scripts \
  && make defconfig \
  && make oldconfig
