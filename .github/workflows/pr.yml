@@ -38,4 +38,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           path: ${{ github.workspace }}/*metal-kernel*
-          name: metal-kernel-${{ matrix.kernel }}-pr-${GITHUB_HEAD_REF##*/}
+          name: metal-kernel-${{ matrix.kernel }}-pr
