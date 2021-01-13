@@ -22,7 +22,7 @@ jobs:
       - name: Figure out if running fork PR
         id: fork
         run: '["${{ secrets.DOCKER_REGISTRY_TOKEN }}" == ""] && echo "::set-output name=is_fork_pr::true" || echo "::set-output name=is_fork_pr::false"'
-  
+
       - name: Build project # This would actually build your project, using zip for an example artifact
         run: |
           docker build --build-arg KERNEL_MAJOR="v5.x" \
@@ -33,9 +33,12 @@ jobs:
           tar -xf kernel.tar metal-kernel
           mv metal-kernel metal-kernel-${{ matrix.kernel }}-pr-${GITHUB_HEAD_REF##*/}
 
-      - name: Upload
-        id: upload-artifact
-        uses: actions/upload-artifact@v2
+      - uses: google-github-actions/setup-gcloud@master
         with:
-          path: ${{ github.workspace }}/*metal-kernel*
-          name: metal-kernel-${{ matrix.kernel }}-pr
+          version: '323.0.0'
+          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Upload kernel to GCS
+        run: gsutil -m cp -r -p metal-kernel-${{ matrix.kernel }} metal-kernel/pull_requests/
+        if: steps.fork.outputs.is_fork_pr == 'false'
