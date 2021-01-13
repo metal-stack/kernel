@@ -31,7 +31,7 @@ jobs:
                       --tag metal-stack/kernel .
           docker export $(docker create metal-stack/kernel /dev/null) > kernel.tar
           tar -xf kernel.tar metal-kernel
-          mv metal-kernel metal-kernel-${{ matrix.kernel }}-pr-${GITHUB_HEAD_REF##*/}
+          cp metal-kernel metal-kernel-${{ matrix.kernel }}-pr-${GITHUB_HEAD_REF##*/}
 
       - uses: google-github-actions/setup-gcloud@master
         with:
@@ -40,5 +40,5 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
 
       - name: Upload kernel to GCS
-        run: gsutil -m cp -r -p metal-kernel-${{ matrix.kernel }} metal-kernel/pull_requests/
+        run: gsutil -m cp -r metal-kernel metal-kernel/pull_requests/metal-kernel-${{ matrix.kernel }}
         if: steps.fork.outputs.is_fork_pr == 'false'
