@@ -1,4 +1,4 @@
-FROM alpine:3.13
+FROM alpine:3.14
 
 ARG KERNEL_MAJOR
 ARG KERNEL_VERSION
@@ -23,8 +23,6 @@ RUN set -ex \
     installkernel \
     kmod \
     elfutils-dev \
-    libressl \
-    libressl-dev \
     linux-headers \
     libunwind-dev \
     lz4 \
