@@ -33,9 +33,8 @@ jobs:
           tar -xf kernel.tar metal-kernel
           cp metal-kernel metal-kernel-${{ matrix.kernel }}-pr-${GITHUB_HEAD_REF##*/}
 
-      - uses: google-github-actions/setup-gcloud@master
+      - uses: google-github-actions/setup-gcloud@v0
         with:
-          version: '323.0.0'
           service_account_email: ${{ secrets.GCP_SA_EMAIL }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
 
