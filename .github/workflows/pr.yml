@@ -13,7 +13,7 @@ jobs:
  
     strategy:
       matrix:
-        kernel: ["5.10.140"]
+        kernel: ["5.10.142"]
 
     steps:
       - name: Checkout
