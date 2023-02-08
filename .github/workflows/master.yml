@@ -13,7 +13,7 @@ jobs:
  
     strategy:
       matrix:
-        kernel: ["5.10.162"]
+        kernel: ["6.1.10"]
 
     steps:
       - name: Checkout
@@ -21,7 +21,7 @@ jobs:
 
       - name: Build project # This would actually build your project, using zip for an example artifact
         run: |
-          docker build --build-arg KERNEL_MAJOR="v5.x" \
+          docker build --build-arg KERNEL_MAJOR="v6.x" \
                       --build-arg KERNEL_VERSION=${{ matrix.kernel }} \
                       --build-arg KERNEL_SERIES="mainline" \
                       --tag metal-stack/kernel .

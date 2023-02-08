@@ -1,5 +1,5 @@
 .ONESHELL:
-KERNEL_VERSION := $(or ${KERNEL_VERSION},5.10.118)
+KERNEL_VERSION := $(or ${KERNEL_VERSION},6.1.10)
 
 
 .PHONY: all
@@ -7,7 +7,7 @@ all: build
 	
 .PHONY: build
 build:
-	docker build --build-arg KERNEL_MAJOR="v5.x" \
+	docker build --build-arg KERNEL_MAJOR="v6.x" \
                  --build-arg KERNEL_VERSION=${KERNEL_VERSION} \
                  --build-arg KERNEL_SERIES="mainline" \
                  --tag metal-stack/kernel .
