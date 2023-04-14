@@ -13,7 +13,7 @@ jobs:
  
     strategy:
       matrix:
-        kernel: ["6.1.22"]
+        kernel: ["6.1.24"]
 
     steps:
       - name: Checkout
