@@ -13,11 +13,11 @@ jobs:
  
     strategy:
       matrix:
-        kernel: ["6.6.1"]
+        kernel: ["6.6.2"]
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build project # This would actually build your project, using zip for an example artifact
         run: |

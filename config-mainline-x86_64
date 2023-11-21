@@ -313,6 +313,7 @@ CONFIG_CC_HAS_SANE_STACKPROTECTOR=y
 # Processor type and features
 #
 CONFIG_SMP=y
+# CONFIG_X86_X2APIC is not set
 CONFIG_X86_MPPARSE=y
 # CONFIG_GOLDFISH is not set
 # CONFIG_X86_CPU_RESCTRL is not set
@@ -322,7 +323,12 @@ CONFIG_X86_MPPARSE=y
 # CONFIG_IOSF_MBI is not set
 CONFIG_X86_SUPPORTS_MEMORY_FAILURE=y
 CONFIG_SCHED_OMIT_FRAME_POINTER=y
-# CONFIG_HYPERVISOR_GUEST is not set
+CONFIG_HYPERVISOR_GUEST=y
+# CONFIG_PARAVIRT is not set
+# CONFIG_ARCH_CPUIDLE_HALTPOLL is not set
+CONFIG_PVH=y
+# CONFIG_JAILHOUSE_GUEST is not set
+# CONFIG_ACRN_GUEST is not set
 # CONFIG_MK8 is not set
 # CONFIG_MPSC is not set
 # CONFIG_MCORE2 is not set
@@ -3296,6 +3302,7 @@ CONFIG_VHOST_VSOCK=y
 #
 # Microsoft Hyper-V guest support
 #
+# CONFIG_HYPERV is not set
 # end of Microsoft Hyper-V guest support
 
 # CONFIG_GREYBUS is not set
