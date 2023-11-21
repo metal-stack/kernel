@@ -1,2 +1,4 @@
 linux-*
 .vscode
+kernel.tar
+metal-kernel*
