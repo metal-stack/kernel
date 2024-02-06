@@ -1,5 +1,5 @@
 .ONESHELL:
-KERNEL_VERSION := $(or ${KERNEL_VERSION},6.6.14)
+KERNEL_VERSION := $(or ${KERNEL_VERSION},6.6.16)
 
 .PHONY: all
 all: build
