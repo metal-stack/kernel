@@ -62,7 +62,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
-            metal-kernel/*
+            metal-kernel/${TARGET_BINARY_LOCATION}/*
         if: ${{ github.event_name == 'release' }}
 
   release-drafter:
@@ -72,7 +72,7 @@ jobs:
       - uses: release-drafter/release-drafter@v6
         with:
           tag: "${{ env.kernel }}"
-          version: "Kernel ${{ env.kernel }}"
+          version: "Kernel ${{ env.kernel }}-${{ github.run_number }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ github.event_name == 'push' }}
