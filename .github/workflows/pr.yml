@@ -10,18 +10,21 @@ env:
 jobs:
   build:
     runs-on: ubuntu-22.04
- 
+
     strategy:
       matrix:
-        kernel: ["6.6.16"]
+        kernel: ["6.6.20"]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Figure out if running fork PR
-        id: fork
-        run: '["${{ secrets.DOCKER_REGISTRY_TOKEN }}" == ""] && echo "::set-output name=is_fork_pr::true" || echo "::set-output name=is_fork_pr::false"'
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
 
       - name: Build project # This would actually build your project, using zip for an example artifact
         run: |
@@ -33,11 +36,5 @@ jobs:
           tar -xf kernel.tar metal-kernel
           cp metal-kernel metal-kernel-${{ matrix.kernel }}-pr-${GITHUB_HEAD_REF##*/}
 
-      - uses: google-github-actions/setup-gcloud@v0
-        with:
-          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-
       - name: Upload kernel to GCS
-        run: gsutil -m cp -r metal-kernel gs://$GCS_BUCKET/metal-kernel/pull_requests/metal-kernel-${{ matrix.kernel }}
-        if: steps.fork.outputs.is_fork_pr == 'false'
+        run: gsutil -m -h "Cache-Control:no-store" cp -r metal-kernel gs://$GCS_BUCKET/metal-kernel/pull_requests/metal-kernel-${{ matrix.kernel }}
