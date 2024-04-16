@@ -48,7 +48,9 @@ jobs:
                       --tag metal-stack/kernel .
 
           docker export $(docker create metal-stack/kernel /dev/null) > kernel.tar
-          tar -xf kernel.tar metal-kernel-${{ env.kernel }}
+          tar -xf kernel.tar metal-kernel
+          cp metal-kernel metal-kernel-${{ env.kernel }}
+
           md5sum metal-kernel-${{ env.kernel }} > metal-kernel-${{ env.kernel }}.md5
 
           mkdir metal-kernel/${TARGET_BINARY_LOCATION}
