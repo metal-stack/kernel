@@ -53,7 +53,7 @@ jobs:
 
           md5sum metal-kernel-${{ env.kernel }} > metal-kernel-${{ env.kernel }}.md5
 
-          mkdir metal-kernel/${TARGET_BINARY_LOCATION}
+          mkdir -p metal-kernel/${TARGET_BINARY_LOCATION}
           cp metal-kernel-${{ env.kernel }} metal-kernel-${{ env.kernel }}.md5 metal-kernel/${TARGET_BINARY_LOCATION}
 
       - name: Upload kernel to GCS
