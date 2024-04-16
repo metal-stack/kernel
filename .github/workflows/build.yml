@@ -57,7 +57,7 @@ jobs:
           mv metal-kernel-${{ env.kernel }} metal-kernel-${{ env.kernel }}.md5 metal-kernel/${TARGET_BINARY_LOCATION}
 
       - name: Upload kernel to GCS
-        run: gsutil -m -h "Cache-Control:no-store" cp metal-kernel gs://$GCS_BUCKET
+        run: gsutil -r -m -h "Cache-Control:no-store" cp metal-kernel gs://$GCS_BUCKET
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
