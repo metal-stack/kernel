@@ -49,12 +49,12 @@ jobs:
 
           docker export $(docker create metal-stack/kernel /dev/null) > kernel.tar
           tar -xf kernel.tar metal-kernel
-          cp metal-kernel metal-kernel-${{ env.kernel }}
+          mv metal-kernel metal-kernel-${{ env.kernel }}
 
           md5sum metal-kernel-${{ env.kernel }} > metal-kernel-${{ env.kernel }}.md5
 
           mkdir -p metal-kernel/${TARGET_BINARY_LOCATION}
-          cp metal-kernel-${{ env.kernel }} metal-kernel-${{ env.kernel }}.md5 metal-kernel/${TARGET_BINARY_LOCATION}
+          mv metal-kernel-${{ env.kernel }} metal-kernel-${{ env.kernel }}.md5 metal-kernel/${TARGET_BINARY_LOCATION}
 
       - name: Upload kernel to GCS
         run: gsutil -m -h "Cache-Control:no-store" cp metal-kernel gs://$GCS_BUCKET
