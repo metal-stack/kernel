@@ -9,11 +9,11 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     strategy:
       matrix:
-        kernel: ["6.6.30"]
+        kernel: ["6.6.32"]
 
     steps:
       - name: Checkout
