@@ -1,0 +1,80 @@
+name: Build
+
+on:
+  pull_request:
+    branches:
+      - master
+  release:
+    types:
+      - published
+  push:
+    branches:
+      - master
+
+env:
+  kernel: "6.6.37"
+  GCS_BUCKET: images.metal-pod.io
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Make tag
+        run: |
+          [ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && echo "TAG_NAME=$(echo $GITHUB_REF | awk -F / '{print $3}')-${GITHUB_HEAD_REF##*/}" >> $GITHUB_ENV || true
+          [ "${GITHUB_EVENT_NAME}" == 'release' ] && echo "TAG_NAME=${GITHUB_REF##*/}" >> $GITHUB_ENV || true
+          [ "${GITHUB_EVENT_NAME}" == 'push' ] && echo "TAG_NAME=latest" >> $GITHUB_ENV || true
+
+          [ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && echo "TARGET_BINARY_LOCATION=pull_requests/$(echo $GITHUB_REF | awk -F / '{print $3}')-${GITHUB_HEAD_REF##*/}" >> $GITHUB_ENV || true
+          [ "${GITHUB_EVENT_NAME}" == 'release' ] && echo "TARGET_BINARY_LOCATION=${GITHUB_REF##*/}" >> $GITHUB_ENV || true
+          [ "${GITHUB_EVENT_NAME}" == 'push' ] && echo "TARGET_BINARY_LOCATION=mainline" >> $GITHUB_ENV || true
+
+      - name: Build
+        run: |
+          docker build --build-arg KERNEL_MAJOR="v6.x" \
+                      --build-arg KERNEL_VERSION=${{ env.kernel }} \
+                      --build-arg KERNEL_SERIES="mainline" \
+                      --tag metal-stack/kernel .
+
+          docker export $(docker create metal-stack/kernel /dev/null) > kernel.tar
+          tar -xf kernel.tar metal-kernel
+          mv metal-kernel metal-kernel-${{ env.kernel }}
+
+          md5sum metal-kernel-${{ env.kernel }} > metal-kernel-${{ env.kernel }}.md5
+
+          mkdir -p metal-kernel/${TARGET_BINARY_LOCATION}
+          mv metal-kernel-${{ env.kernel }} metal-kernel-${{ env.kernel }}.md5 metal-kernel/${TARGET_BINARY_LOCATION}
+
+      - name: Upload kernel to GCS
+        run: gsutil -m -h "Cache-Control:no-store" cp -r metal-kernel gs://$GCS_BUCKET
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            metal-kernel/${TARGET_BINARY_LOCATION}/*
+        if: ${{ github.event_name == 'release' }}
+
+  release-drafter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: release-drafter/release-drafter@v6
+        with:
+          tag: "${{ env.kernel }}"
+          version: "Kernel ${{ env.kernel }}-${{ github.run_number }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ github.event_name == 'push' }}
