@@ -1,4 +1,4 @@
-name-template: '$INPUT_VERSION'
+name-template: 'Kernel $INPUT_VERSION'
 
 template: |
   ## General Changes

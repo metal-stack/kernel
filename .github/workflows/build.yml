@@ -73,8 +73,8 @@ jobs:
     steps:
       - uses: release-drafter/release-drafter@v6
         with:
-          tag: "${{ env.kernel }}"
-          version: "Kernel ${{ env.kernel }}-${{ github.run_number }}"
+          tag: "${{ env.kernel }}-${{ github.run_number }}"
+          version: "${{ env.kernel }}-${{ github.run_number }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ github.event_name == 'push' }}
