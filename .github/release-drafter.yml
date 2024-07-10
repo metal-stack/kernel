@@ -1,5 +1,4 @@
-name-template: 'v$RESOLVED_VERSION'
-tag-template: 'v$RESOLVED_VERSION'
+name-template: '$INPUT_VERSION'
 
 template: |
   ## General Changes
