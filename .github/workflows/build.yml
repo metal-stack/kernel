@@ -32,12 +32,7 @@ jobs:
 
       - name: Make tag
         run: |
-          [ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && echo "TAG_NAME=$(echo $GITHUB_REF | awk -F / '{print $3}')-${GITHUB_HEAD_REF##*/}" >> $GITHUB_ENV || true
-          [ "${GITHUB_EVENT_NAME}" == 'release' ] && echo "TAG_NAME=${GITHUB_REF##*/}" >> $GITHUB_ENV || true
-          [ "${GITHUB_EVENT_NAME}" == 'push' ] && echo "TAG_NAME=latest" >> $GITHUB_ENV || true
-
           [ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && echo "TARGET_BINARY_LOCATION=pull_requests/$(echo $GITHUB_REF | awk -F / '{print $3}')-${GITHUB_HEAD_REF##*/}" >> $GITHUB_ENV || true
-          [ "${GITHUB_EVENT_NAME}" == 'release' ] && echo "TARGET_BINARY_LOCATION=${GITHUB_REF##*/}" >> $GITHUB_ENV || true
           [ "${GITHUB_EVENT_NAME}" == 'push' ] && echo "TARGET_BINARY_LOCATION=mainline" >> $GITHUB_ENV || true
 
       - name: Build
@@ -55,16 +50,25 @@ jobs:
 
           mkdir -p metal-kernel/${TARGET_BINARY_LOCATION}
           mv metal-kernel-${{ env.kernel }} metal-kernel-${{ env.kernel }}.md5 metal-kernel/${TARGET_BINARY_LOCATION}
+        if: ${{ github.event_name != 'release' }}
 
       - name: Upload kernel to GCS
         run: gsutil -m -h "Cache-Control:no-store" cp -r metal-kernel gs://$GCS_BUCKET
+        if: ${{ github.event_name != 'release' }}
+
+      - name: Prepare release
+        run: |
+          mkdir -p metal-kernel
+          gsutil -m cp gs://$GCS_BUCKET/metal-kernel/mainline/metal-kernel-${{ env.kernel }} metal-kernel/metal-kernel
+          gsutil -m cp gs://$GCS_BUCKET/metal-kernel/mainline/metal-kernel-${{ env.kernel }}.md5 metal-kernel/metal-kernel.md5
+        if: ${{ github.event_name == 'release' }}
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
-            metal-kernel/${TARGET_BINARY_LOCATION}/*
+            metal-kernel/*
         if: ${{ github.event_name == 'release' }}
 
   release-drafter:
