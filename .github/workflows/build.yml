@@ -12,7 +12,7 @@ on:
       - master
 
 env:
-  kernel: "6.6.50"
+  kernel: "6.6.52"
   GCS_BUCKET: images.metal-pod.io
 
 jobs:
