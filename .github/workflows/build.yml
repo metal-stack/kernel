@@ -12,7 +12,7 @@ on:
       - master
 
 env:
-  kernel: "6.12.2"
+  kernel: "6.12.4"
   GCS_BUCKET: images.metal-pod.io
 
 jobs:
@@ -72,7 +72,7 @@ jobs:
         if: ${{ github.event_name == 'release' }}
 
   release-drafter:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: release-drafter/release-drafter@v6
