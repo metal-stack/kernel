@@ -12,7 +12,7 @@ on:
       - master
 
 env:
-  kernel: "6.18.20"
+  kernel: "6.18.26"
   GCS_BUCKET: images.metal-pod.io
 
 jobs:
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: release-drafter/release-drafter@v6
+      - uses: release-drafter/release-drafter@v7
         with:
           tag: "${{ env.kernel }}-${{ github.run_number }}"
           version: "${{ env.kernel }}-${{ github.run_number }}"
