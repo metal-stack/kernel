@@ -38,9 +38,9 @@ RUN set -ex \
     zlib-dev \
     zstd
 
-ENV KERNEL_SOURCE=https://www.kernel.org/pub/linux/kernel/${KERNEL_MAJOR}/linux-${KERNEL_VERSION}.tar.xz
-ENV KERNEL_SHA256_SUMS=https://www.kernel.org/pub/linux/kernel/${KERNEL_MAJOR}/sha256sums.asc
-ENV KERNEL_PGP2_SIGN=https://www.kernel.org/pub/linux/kernel/${KERNEL_MAJOR}/linux-${KERNEL_VERSION}.tar.sign
+ENV KERNEL_SOURCE=https://cdn.kernel.org/pub/linux/kernel/${KERNEL_MAJOR}/linux-${KERNEL_VERSION}.tar.xz
+ENV KERNEL_SHA256_SUMS=https://cdn.kernel.org/pub/linux/kernel/${KERNEL_MAJOR}/sha256sums.asc
+ENV KERNEL_PGP2_SIGN=https://cdn.kernel.org/pub/linux/kernel/${KERNEL_MAJOR}/linux-${KERNEL_VERSION}.tar.sign
 
 # tell xz decompressor to use as much threads as cpu cores
 ENV XZ_OPT="--threads=0"
