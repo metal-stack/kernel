@@ -12,12 +12,12 @@ on:
       - master
 
 env:
-  kernel: "6.18.58"
+  kernel: "6.18.60"
   GCS_BUCKET: images.metal-pod.io
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Checkout
